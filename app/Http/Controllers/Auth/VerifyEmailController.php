@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
+use App\Providers\RouteServiceProvider1;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\RedirectResponse;
@@ -16,13 +17,25 @@ class VerifyEmailController extends Controller
     public function __invoke(EmailVerificationRequest $request): RedirectResponse
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
+            $user = auth()->user()->Role;
+            if ($user == 'seller') {
+                return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
+            } else {
+                return redirect()->intended(RouteServiceProvider1::HOME.'?verified=1');
+            }
+            // return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
         }
 
         if ($request->user()->markEmailAsVerified()) {
             event(new Verified($request->user()));
         }
-
-        return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
+        
+        $user = auth()->user()->Role;
+        if ($user == 'seller') {
+            return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
+        } else {
+            return redirect()->intended(RouteServiceProvider1::HOME.'?verified=1');
+        }
+        // return redirect()->intended(default: RouteServiceProvider::HOME.'?verified=1');
     }
 }

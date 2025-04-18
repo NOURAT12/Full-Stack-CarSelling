@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\setting;
 use App\Providers\RouteServiceProvider;
+use App\Providers\RouteServiceProvider1;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,9 +21,12 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): Response
     {
+        $settings = setting::first();
+
         return Inertia::render('Auth/Login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => session('status'),
+            'settings' => $settings
         ]);
     }
 
@@ -32,7 +37,12 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
         $request->session()->regenerate();
-        return redirect()->intended(RouteServiceProvider::HOME);
+        $user = auth()->user()->Role;
+        if ($user == 'seller') {
+            return redirect(RouteServiceProvider::HOME);
+        } else {
+            return redirect(RouteServiceProvider1::HOME);
+        }
     }
 
     /**

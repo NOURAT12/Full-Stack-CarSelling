@@ -1,76 +1,78 @@
+<script setup>
+import SellerAuthenticatedLayout from "@/Layouts/SellerAuthenticatedLayout.vue";
+import { Head } from "@inertiajs/vue3";
+import { Link } from "@inertiajs/vue3";
+import CarCard from "@/Components/CarCard.vue"; // تأكد من المسار الصحيح
+
+defineProps({
+  cars: Object,
+  settings: Object,
+});
+</script>
+
 <template>
   <Head title="Cars Index" />
 
-  <AuthenticatedLayout>
+  <SellerAuthenticatedLayout :settings="settings">
     <template #header>
       <h2 class="font-semibold text-xl text-gray-800 leading-tight">Cars</h2>
     </template>
 
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="flex justify-end m-2 p-2">
+        <!-- زر إنشاء -->
+        <div class="flex justify-end mb-6" v-if="$page.props.auth.user">
           <Link
-            href="/cars/create"
+            :href="route('cars.create')"
             class="px-4 py-2 bg-indigo-500 hover:bg-indigo-700 text-white rounded-md"
-            >New Car</Link
           >
+            New Car
+          </Link>
         </div>
-
-        <div class="relative overflow-x-auto">
-          <table
-            class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
-          >
-            <thead
-              class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+        <div>
+          <!-- عرض السيارات -->
+          <div v-if="cars && cars.data && cars.data.length > 0"
             >
-              <tr>
-                <th scope="col" class="px-6 py-3">Name</th>
-                <th scope="col" class="px-6 py-3">Image</th>
-                <th scope="col" class="px-6 py-3">Price</th>
-                <th scope="col" class="px-6 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="car in cars.data"
-                :key="car.id"
-                class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-              >
-                <td class="px-6 py-4">{{ car.name }}</td>
-                <td class="px-6 py-4">
-                    <img :src="car.path" class="w-12 h-12 rounded "/>
-                </td>
-                <td class="px-6 py-4">{{ car.price }}$</td>
-                <td class="px-6 py-4">
+            <div
+              class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+            >
+              <CarCard v-for="car in cars.data" :key="car.id" :car="car">
+              </CarCard>
+            </div>
+
+            <!-- روابط التصفح -->
+            <div class="mt-8 flex justify-center">
+              <nav class="inline-flex items-center space-x-1">
+                <template v-for="(link, index) in cars.links" :key="index">
                   <Link
-                    :href="route('cars.edit',car.id)"
-                    class="font-medium text-blue-500 hover:text-blue-700 mr-2"
-                    >Edit
+                    v-if="link.url"
+                    :href="link.url"
+                    :class="[
+                      'px-4 py-2 border text-sm rounded',
+                      link.active
+                        ? 'bg-indigo-500 text-white'
+                        : 'bg-white text-gray-700 hover:bg-gray-100',
+                    ]"
+                  >
+                    <span v-html="link.label" />
                   </Link>
-                  <Link
-                    :href="route('cars.destroy', car.id)"
-                    method="delete"
-                    as="button"
-                    type="button"
-                    class=":font-medium text-red-500 hover:text-red-700 mr-2"
-                    >Delete
-                  </Link>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  <span
+                    v-else
+                    class="px-4 py-2 border text-sm text-gray-400 rounded cursor-not-allowed"
+                  >
+                    <span v-html="link.label" />
+                  </span>
+                </template>
+              </nav>
+            </div>
+          </div>
+
+          <!-- لا توجد سيارات -->
+          <div v-else class="text-center text-gray-500 text-lg mt-10">
+            You don't have any cars yet.
+          </div>
         </div>
       </div>
     </div>
-  </AuthenticatedLayout>
+  </SellerAuthenticatedLayout>
 </template>
-
-<script setup>
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, Link } from "@inertiajs/vue3";
-
-defineProps({
-    cars: Object,
-});
-</script>
-z

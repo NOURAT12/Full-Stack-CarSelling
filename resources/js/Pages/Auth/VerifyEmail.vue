@@ -8,6 +8,7 @@ const props = defineProps({
     status: {
         type: String,
     },
+    settings: Object,
 });
 
 const form = useForm({});
@@ -20,7 +21,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
 </script>
 
 <template>
-    <GuestLayout>
+    <GuestLayout :settings="settings">
         <Head title="Email Verification" />
 
         <div class="mb-4 text-sm text-gray-600">

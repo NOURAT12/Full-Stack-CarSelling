@@ -1,26 +1,41 @@
 <script setup>
 import { Link } from "@inertiajs/vue3";
+
 defineProps({
   car: Object,
 });
 </script>
+
 <template>
-  <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-4">
-    <div class="mb-6">
-      <img class="w-full h-px-200 rounded-2xl" :src="car.path" :alt="car.name" />
-    </div>
+  <Link :href="route('cars.show', car.id)" class="block">
+    <div class="bg-white overflow-hidden shadow-lg rounded-lg p-4 hover:shadow-xl transition-shadow duration-300">
+      <img
+        v-if="car.image"
+        class="w-full h-48 object-cover rounded-lg mb-4"
+        :src="car.image"
+        :alt="`${car.brand} ${car.model}`"
+      />
+      <div v-else class="w-full h-48 bg-gray-200 rounded-lg mb-4 flex items-center justify-center text-gray-500">
+        No Image
+      </div>
 
-    <h3 class="group-hover:text-light-tail-500 text-xl font-semibold capitalize mb-3">
-      {{ car.name }}
-    </h3>
+      <h3 class="text-xl font-semibold text-gray-800 mb-2">
+        {{ car.brand }} {{ car.model }} - {{ car.year }}
+      </h3>
 
-    <div class="flex items-center space-x-2">
-      <span class="text-lg font-semibold text-green-500">
-        {{ car.price }}$
-      </span>
-      <span class="text-sm text-gray-500 line-through">
-        {{ 100 }}$
-      </span>
+      <p class="text-sm text-gray-600 mb-2">
+        {{ car.description }}
+      </p>
+
+      <div class="flex items-center justify-between mt-4">
+        <span class="text-green-600 font-bold">{{ car.price }} $</span>
+        <span
+          class="text-xs font-medium"
+          :class="car.sold ? 'text-red-600' : 'text-green-500'"
+        >
+          {{ car.sold ? "Sold" : "Available" }}
+        </span>
+      </div>
     </div>
-  </div>
+  </Link>
 </template>

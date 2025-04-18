@@ -10,9 +10,17 @@ class Car extends Model
 {
     use HasFactory,ImageTrait;
     protected $fillable = [
-        'path',
-        'name',
+        'user_id',
+        'brand',
+        'model',
+        'year',
         'price',
+        'carimages',
+        'description',
+        'sold',
+        'color',
+        'city',
+        'country',
     ];
     public $appends=[
         'image_url'

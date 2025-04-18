@@ -8,8 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 
+
 class RouteServiceProvider extends ServiceProvider
-{
+{ 
+
     /**
      * The path to your application's "home" route.
      *
@@ -17,7 +19,8 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/dashboard';
+
+    public const HOME = 'seller/dashboard';
 
     /**
      * Define your route model bindings, pattern filters, and other route configuration.

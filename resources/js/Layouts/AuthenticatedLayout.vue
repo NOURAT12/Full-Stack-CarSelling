@@ -4,21 +4,25 @@ import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import NavLink from "@/Components/NavLink.vue";
+import Footer from "@/Components/Footer.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import { Link } from "@inertiajs/vue3";
 
 const showingNavigationDropdown = ref(false);
+const props = defineProps({
+  settings: Object,
+});
 </script>
 
 <template>
   <div>
     <div
-    v-if="$page.props.flash.message"
-    class="p-4 mb-4 text-sm text-blue-700 bg-blue-100 dark:bg-blue-400 dark:text-blue-800"
-    role="alert"
-  >
-    <div class="max-w-7xl mx-auto">{{ $page.props.flash.message }}</div>
-  </div>
+      v-if="$page.props.flash.message"
+      class="p-4 mb-4 text-sm text-blue-700 bg-blue-100 dark:bg-blue-400 dark:text-blue-800 flex justify-center"
+      role="alert"
+    >
+      <div class="max-w-7xl mx-auto">{{ $page.props.flash.message }}</div>
+    </div>
     <div class="min-h-screen bg-gray-100">
       <nav class="bg-white border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -26,26 +30,43 @@ const showingNavigationDropdown = ref(false);
             <div class="flex">
               <!-- Logo -->
               <div class="shrink-0 flex items-center">
-                <Link :href="route('dashboard')">
-                  <ApplicationLogo
-                    class="block h-9 w-auto fill-current text-gray-800"
-                  />
+                <Link :href="route('admindashboard')">
+                  <div class="text-center">
+                    <img
+                      :src="settings.logo"
+                      alt="Logo"
+                      class="mx-auto h-8 w-auto"
+                    />
+                  </div>
                 </Link>
               </div>
 
               <!-- Navigation Links -->
               <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                 <NavLink
-                  :href="route('dashboard')"
-                  :active="route().current('dashboard')"
+                  :href="route('admindashboard')"
+                  :active="route().current('admindashboard')"
                 >
                   Dashboard
                 </NavLink>
                 <NavLink
-                  :href="route('cars.index')"
-                  :active="route().current('cars.index')"
+                  :href="route('advertisements.index')"
+                  :active="route().current('advertisements.index')"
                 >
-                  Cars
+                  Advertisements
+                </NavLink>
+
+                <NavLink
+                  :href="route('reviews.index')"
+                  :active="route().current('reviews.index')"
+                >
+                  Reviews
+                </NavLink>
+                <NavLink
+                  :href="route('settings.index')"
+                  :active="route().current('S=settings.index')"
+                >
+                  Settings
                 </NavLink>
               </div>
             </div>
@@ -54,7 +75,12 @@ const showingNavigationDropdown = ref(false);
               <span class="text-gray-700 font-medium">{{
                 $page.props.auth.user.username
               }}</span>
-              <Link :href="route('logout')" method="post" as="button" class="ml-4">
+              <Link
+                :href="route('logout')"
+                method="post"
+                as="button"
+                class="ml-4"
+              >
                 <button
                   type="submit"
                   class="px-3 py-2 bg-red-500 text-white text-sm font-semibold rounded-md hover:bg-red-600 transition"
@@ -102,11 +128,12 @@ const showingNavigationDropdown = ref(false);
           </div>
         </div>
       </nav>
-
       <!-- Page Content -->
       <main>
         <slot />
       </main>
     </div>
+    <!-- Footer -->
+    <Footer :settings="settings" />
   </div>
 </template>

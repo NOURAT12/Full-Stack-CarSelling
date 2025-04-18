@@ -1,10 +1,16 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdvertisementsController;
+use App\Http\Controllers\Admin\ReviewsController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\SellerController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\WelcomeController;
 use App\Http\Resources\ProductResource;
 use App\Models\Car;
+use App\Models\setting;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -20,38 +26,34 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('/', function () {
-    return Inertia::render('Welcome',[
-        'status' => session('status'),
-    ]);
+
+Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
+
+
+// Route::resource( '/cars',AdminController::class);
+
+Route::middleware(['auth','verified','seller'])->prefix('seller')->group(function(){
+    Route::get('/dashboard',[WelcomeController::class, 'sellerDash'])->name('sellerdashboard');
+    Route::resource( '/cars',controller: SellerController::class);
+    Route::post('seller/cars/{car}', [SellerController::class, 'update'])->name('cars.update');
 });
 
-// Route::get('/', function () {
-//     return Inertia::render('Welcome', [
-//         'canLogin' => Route::has('login'),
-//         'laravelVersion' => Application::VERSION,
-//         'phpVersion' => PHP_VERSION,
-//     ]);
-// });
-
-// Route::controller(AuthenticatedSessionController::class)->group(function () {
-//     Route::post('login', 'store')->name('login');
-//     Route::post('logout', 'logout')->name('logout');
-// });
-
-Route::resource( '/cars',AdminController::class);
-
-
-// Route::get('/dashboard', function () {
-//     return Inertia::render('Dashboard');
-// });
-
-Route::middleware(['auth'])->group(function(){
-    Route::get('/dashboard', function () {
-        $cars = ProductResource::collection(Car::all());
-        return Inertia::render('Dashboard',compact('cars'));
-    })->name('dashboard');
+Route::middleware(['auth','verified','admin'])->prefix('admin')->group(function(){
+    Route::get('/dashboard',[WelcomeController::class, 'adminDash'])->name('admindashboard');
+    Route::resource( '/advertisements',AdvertisementsController::class);
+    Route::post('/advertisements/{advertisement}', [AdvertisementsController::class, 'update'])->name('advertisements.update');
+    Route::resource( '/reviews',ReviewsController::class);
+    Route::post('/reviews/{id}/status', [ReviewsController::class, 'updateStatus']);
+    Route::resource( '/settings',SettingsController::class);
+    Route::post('/settings/{settings}', [SettingsController::class, 'update'])->name('settings.update');
 });
+
+Route::get('/home',[UserController::class, 'homeUser'])->name('userhome');
+Route::resource( '/reviews',ReviewsController::class);
+Route::resource( '/cars', SellerController::class);
+Route::post('/ads/{id}/increment-hit', [UserController::class, 'incrementHit'])->name('ads.incrementHit');
+Route::get('/search-results', [UserController::class, 'results'])->name('search.results');
+
 
 
 // Route::middleware('auth')->group(function () {
