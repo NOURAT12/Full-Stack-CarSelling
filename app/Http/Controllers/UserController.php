@@ -8,6 +8,8 @@ use App\Models\Review;
 use App\Models\Setting;
 use App\Traits\ImageTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -37,12 +39,36 @@ class UserController extends Controller
         }
 
         $settings = Setting::first();
-        $settings->logo = $this->getLogo(image: $settings->logo);
-
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         return Inertia::render('Cars/Index', [
             'settings' => $settings,
             'cars' => $cars,
         ]);
+    }
+
+    public function create_reviews(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'min:2'],
+            'phone' => ['required', 'min:2'],
+            'is_public' => ['required'],
+            'content' => ['required', 'string'],
+            'car_id' => ['required' , 'exists:cars,id'],
+        ]);
+
+
+        Review::create([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'is_public' => $request->is_public,
+            'content' => $request->content,
+            'status' => 2,
+            'car_id' => $request->car_id,
+        ]);
+
+        return Redirect::back()->with('message', 'Review  added successfully.');
     }
     public function homeUser()
     {
@@ -50,10 +76,13 @@ class UserController extends Controller
         $ads = Ad::whereDate('start_date', '<=', now())
             ->whereDate('end_date', '>=', now())
             ->get();
-        $latestCars = Car::query()->latest()->take('6')->get();
-        $randomCars = Car::get()->random(3);
+        $latestCars = Car::query()->where('sold', "0")->latest()->take('6')->get();
+        $randomCars = Car::where('sold', "0")->get();
+        if(count($randomCars)>2){
+            $randomCars=$randomCars->random(3);
+        }
 
-        $soldCars = Car::query()->where('sold', 1)->latest()->take('5')->get();
+        $soldCars = Car::query()->where('sold', "1")->latest()->take('6')->get();
         $reviews = Review::query()->where('status', 1)->latest()->take('6')->get();
 
         foreach ($latestCars as $latestCar) {
@@ -73,7 +102,9 @@ class UserController extends Controller
         }
 
         $settings = Setting::first();
-        $settings->logo = $this->getLogo(image: $settings->logo);
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         $images = json_decode($settings->images, true);
         foreach ($images as $image) {
             $imag[] = $this->getImage($image);
@@ -87,6 +118,8 @@ class UserController extends Controller
             'randomCars' => $randomCars,
             'soldCars' => $soldCars,
             'reviews' => $reviews,
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
         ]);
     }
 

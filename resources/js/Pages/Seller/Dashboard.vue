@@ -3,19 +3,35 @@ import SellerAuthenticatedLayout from "@/Layouts/SellerAuthenticatedLayout.vue";
 import { Head } from "@inertiajs/vue3";
 import { Link } from "@inertiajs/vue3";
 import Card from "@/Components/Card.vue";
-import Footer from "@/Components/Footer.vue";
-
-import { ref } from "vue";
+import { router } from "@inertiajs/vue3";
+import { ref , onMounted } from "vue";
 const props = defineProps({
   cars: Object,
   settings: Object,
+  locale: String,
+  translations: Object,
+});
+const localeState = ref(localStorage.getItem("locale") || props.locale || "en");
+router.reload({
+  preserveScroll: true,
+  preserveState: true,
+  headers: {
+    "X-Locale": localeState.value,
+  },
+
+});
+function updateDirection(lang) {
+  document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+}
+onMounted(() => {
+  updateDirection(localeState.value);
 });
 </script>
 
 <template>
   <Head title="Dashboard" />
 
-  <SellerAuthenticatedLayout :settings="settings">
+  <SellerAuthenticatedLayout :locale="locale" :translations="translations" :settings="settings">
     <template #header>
       <h2 class="font-semibold text-xl text-gray-800 leading-tight">Cars</h2>
     </template>
@@ -25,7 +41,7 @@ const props = defineProps({
         <!-- عرض السيارات -->
         <div v-if="cars.data.length > 0">
           <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            <Card v-for="car in cars.data" :key="car.id" :car="car"> </Card>
+            <Card :translations="translations" v-for="car in cars.data" :key="car.id" :car="car"> </Card>
           </div>
 
           <!-- روابط التصفح -->
@@ -57,7 +73,7 @@ const props = defineProps({
 
         <!-- لا توجد سيارات -->
         <div v-else class="text-center text-gray-500 text-lg mt-10">
-          You don't have any cars yet.
+          {{ translations.you }}
         </div>
       </div>
     </div>

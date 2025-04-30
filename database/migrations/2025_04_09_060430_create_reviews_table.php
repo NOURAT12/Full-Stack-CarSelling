@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('phone');
+            $table->foreignId('car_id')->nullable();
             $table->string('content');
             $table->boolean('is_public');
             $table->boolean('status');

@@ -8,6 +8,7 @@ use App\Models\Ad;
 use App\Models\Review;
 use App\Models\Setting;
 use App\Traits\ImageTrait;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
@@ -23,9 +24,12 @@ class SettingsController extends Controller
     {
 
         $setting = Setting::first();
-        $setting->logo = $this->getLogo($setting->logo);
+        if ($setting) {
+            $setting->logo = $this->getLogo($setting->logo);
+
         $imag = [];
         $website_imag = [];
+
         $images = json_decode($setting->images, true);
         foreach ($images as $image) {
             $imag[] = $this->getImage($image);
@@ -50,17 +54,101 @@ class SettingsController extends Controller
                 'images' => $imag,
                 'website_image' => $website_imag,
             ],
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
         ]);
     }
+    return Inertia::render('Settings/Index');
+    }
+    public function create()
+    {
+        $settings = Setting::first();
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
+        return Inertia::render('Settings/Create', [
+            'settings' => $settings,
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
+        ]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'website_name' => ['required', 'min:2'],
+            'facebook' => ['required', 'string'],
+            'instgram' => ['required', 'string'],
+            'whatsapp' => ['required', 'string'],
+            'phone' => ['required', 'string'],
+            'mobile' => ['required', 'string'],
+            'titles' => ['nullable'],
+            'titles.*' => ['string'],
+            'website_image' => ['nullable'],
+            'website_image.*' => ['nullable', 'image', 'max:4096'],
+            'images' => ['nullable'],
+            'images.*' => ['nullable', 'image', 'max:4096'],
+            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:4096'],
+        ]);
+
+        $images = null;
+        if ($request->hasFile('images')) {
+            $paths = [];
+            foreach ($request->file('images') as $file) {
+                $paths[] = $this->setImages($file, 'settings');
+            }
+            $images = json_encode($paths);
+        }
+
+        $website_image = null;
+        if ($request->hasFile('website_image')) {
+            $paths = [];
+            foreach ($request->file('website_image') as $file) {
+                $paths[] = $this->setImages($file, 'settings');
+            }
+            $website_image = json_encode($paths);
+        }
+
+        $logo = null;
+        if ($request->hasFile('logo')) {
+            $logo = $this->setImages($request->logo, 'settings');
+        }
+        $titles = json_encode($request->titles);
+
+
+        Setting::create([
+            'website_name'   => $request->website_name,
+            'facebook'       => $request->facebook,
+            'instgram'       => $request->instgram,
+            'whatsapp'       => $request->whatsapp,
+            'phone'          => $request->phone,
+            'mobile'         => $request->mobile,
+            'titles'         => $titles,
+            'website_image'  => $website_image,
+            'images'         => $images,
+            'logo'           => $logo,
+        ]);
+
+        return Redirect::route('settings.index')->with('message', 'Settings created successfully');
+    }
+
 
 
     public function edit(Setting $settings)
     {
         $settings = Setting::first();
-        $settings->logo = $this->getLogo($settings->logo);
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         $settings->titles = json_decode($settings->titles);
         return Inertia::render('Settings/Edit', [
             'settings' => $settings,
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
         ]);
     }
 
@@ -79,9 +167,9 @@ class SettingsController extends Controller
             'titles' => ['nullable'],
             'titles.*' => ['string'],
             'website_image' => ['nullable'],
-            'website_image.*' => ['nullable','image', 'max:4096'],
+            'website_image.*' => ['nullable', 'image', 'max:4096'],
             'images' => ['nullable'],
-            'images.*' => ['nullable','image', 'max:4096'],
+            'images.*' => ['nullable', 'image', 'max:4096'],
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:4096'],
         ]);
 
@@ -138,18 +226,5 @@ class SettingsController extends Controller
         ]);
 
         return Redirect::route('settings.index')->with('message', 'settings updated successfully');
-    }
-
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Ad $advertisement)
-    {
-        if (file_exists(public_path($advertisement->image))) {
-            File::delete(public_path($advertisement->image));
-        }
-        $advertisement->delete();
-        return Redirect::back()->with('message', 'Car deleted successfully');
     }
 }

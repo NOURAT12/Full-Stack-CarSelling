@@ -20,7 +20,10 @@ const props = defineProps({
         <slot />
       </main>
     </div>
+
     <!-- Footer -->
-    <Footer :settings="settings" />
+    <div v-if="settings" dir="ltr">
+      <Footer :settings="settings" id="contact" />
+    </div>
   </div>
 </template>

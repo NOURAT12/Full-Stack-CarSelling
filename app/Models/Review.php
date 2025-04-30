@@ -10,6 +10,7 @@ class Review extends Model
     use HasFactory;
     protected $fillable = [
         'name',
+        'car_id',
         'phone',
         'content',
         'is_public',

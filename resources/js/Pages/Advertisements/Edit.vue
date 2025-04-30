@@ -1,19 +1,19 @@
 <template>
     <Head title="Edit Advertisement" />
-  
-    <AuthenticatedLayout :settings="settings">
+
+    <AuthenticatedLayout :translations="translations" :locale="locale" :settings="settings">
       <template #header>
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
           Edit Advertisement
         </h2>
       </template>
-  
+
       <div class="py-12">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8 bg-white shadow rounded">
           <form class="p-6 space-y-4" @submit.prevent="submit">
             <!-- Full Name -->
             <div>
-              <InputLabel for="full_name" value="Full Name" />
+              <InputLabel for="full_name" :value="translations.full_name" />
               <TextInput
                 id="full_name"
                 type="text"
@@ -23,10 +23,10 @@
               />
               <InputError class="mt-2" :message="$page.props.errors.full_name" />
             </div>
-  
+
             <!-- Ad URL -->
             <div>
-              <InputLabel for="ad_url" value="Ad URL" />
+              <InputLabel for="ad_url" :value="translations.ad_URL" />
               <TextInput
                 id="ad_url"
                 type="url"
@@ -36,10 +36,10 @@
               />
               <InputError class="mt-2" :message="$page.props.errors.ad_url" />
             </div>
-  
+
             <!-- Start Date -->
             <div>
-              <InputLabel for="start_date" value="Start Date" />
+              <InputLabel for="start_date" :value="translations.start_date" />
               <TextInput
                 id="start_date"
                 type="date"
@@ -49,10 +49,10 @@
               />
               <InputError class="mt-2" :message="$page.props.errors.start_date" />
             </div>
-  
+
             <!-- End Date -->
             <div>
-              <InputLabel for="end_date" value="End Date" />
+              <InputLabel for="end_date" :value="translations.end_date" />
               <TextInput
                 id="end_date"
                 type="date"
@@ -62,10 +62,10 @@
               />
               <InputError class="mt-2" :message="$page.props.errors.end_date" />
             </div>
-  
+
             <!-- Location -->
             <div>
-              <InputLabel for="location" value="Location" />
+              <InputLabel for="location" :value="translations.location" />
               <TextInput
                 id="location"
                 type="text"
@@ -75,10 +75,10 @@
               />
               <InputError class="mt-2" :message="$page.props.errors.location" />
             </div>
-  
+
             <!-- Image Upload -->
             <div>
-              <InputLabel for="image" value="Advertisement Image" />
+              <InputLabel for="image" :value="translations.advertisement_image" />
               <input
                 id="image"
                 type="file"
@@ -87,17 +87,17 @@
               />
               <InputError class="mt-2" :message="$page.props.errors.image" />
             </div>
-  
+
             <!-- Submit -->
             <div class="flex justify-end mt-6">
-              <PrimaryButton class="ms-4">Update</PrimaryButton>
+              <PrimaryButton class="ms-4">{{translations.update}}</PrimaryButton>
             </div>
           </form>
         </div>
       </div>
     </AuthenticatedLayout>
   </template>
-  
+
   <script setup>
   import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
   import { Head, useForm } from "@inertiajs/vue3";
@@ -105,12 +105,14 @@
   import InputLabel from "@/Components/InputLabel.vue";
   import PrimaryButton from "@/Components/PrimaryButton.vue";
   import TextInput from "@/Components/TextInput.vue";
-  
+
   const props = defineProps({
     advertisement: Object,
     settings: Object,
+    translations: Object,
+
   });
-  
+
   const form = useForm({
     full_name: props.advertisement.full_name,
     ad_url: props.advertisement.ad_url,
@@ -120,11 +122,11 @@
     location: props.advertisement.location,
     image: null,
   });
-  
+
   const handleImageUpload = (e) => {
     form.image = e.target.files[0];
   };
-  
+
   const submit = () => {
     form._method = "put";
     form.post(route("advertisements.update", props.advertisement.id), {

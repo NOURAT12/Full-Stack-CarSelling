@@ -36,6 +36,8 @@ Route::middleware(['auth','verified','seller'])->prefix('seller')->group(functio
     Route::get('/dashboard',[WelcomeController::class, 'sellerDash'])->name('sellerdashboard');
     Route::resource( '/cars',controller: SellerController::class);
     Route::post('seller/cars/{car}', [SellerController::class, 'update'])->name('cars.update');
+    Route::get( '/reviews',[SellerController::class, 'indexReviews'])->name('reviewsIndex');
+
 });
 
 Route::middleware(['auth','verified','admin'])->prefix('admin')->group(function(){
@@ -43,7 +45,7 @@ Route::middleware(['auth','verified','admin'])->prefix('admin')->group(function(
     Route::resource( '/advertisements',AdvertisementsController::class);
     Route::post('/advertisements/{advertisement}', [AdvertisementsController::class, 'update'])->name('advertisements.update');
     Route::resource( '/reviews',ReviewsController::class);
-    Route::post('/reviews/{id}/status', [ReviewsController::class, 'updateStatus']);
+    Route::post('/reviews/{id}/status', [ReviewsController::class, 'updateStatus'])->name('reviews.status');
     Route::resource( '/settings',SettingsController::class);
     Route::post('/settings/{settings}', [SettingsController::class, 'update'])->name('settings.update');
 });
@@ -51,8 +53,10 @@ Route::middleware(['auth','verified','admin'])->prefix('admin')->group(function(
 Route::get('/home',[UserController::class, 'homeUser'])->name('userhome');
 Route::resource( '/reviews',ReviewsController::class);
 Route::resource( '/cars', SellerController::class);
+Route::post('seller/cars/{car}', [SellerController::class, 'update'])->name('cars.update');
 Route::post('/ads/{id}/increment-hit', [UserController::class, 'incrementHit'])->name('ads.incrementHit');
 Route::get('/search-results', [UserController::class, 'results'])->name('search.results');
+Route::post('/user-reviews', [UserController::class, 'create_reviews'])->name('user.reviews');
 
 
 

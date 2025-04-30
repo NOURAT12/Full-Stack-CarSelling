@@ -1,13 +1,15 @@
 <script setup>
 import { ref } from "vue";
-defineProps({ review: Object });
+defineProps({ review: Object, translations: Object });
 
 const showModal = ref(false);
-
 </script>
 
 <template>
-  <div class="bg-white p-4 shadow-md rounded-lg space-y-3 h-max" >
+  <div
+    class="bg-white p-4 shadow-md rounded-lg space-y-3 h-50"
+    v-if="review.is_public"
+  >
     <!-- الاسم -->
     <h3 class="text-lg font-bold text-gray-800 truncate" :title="review.name">
       {{ review.name }}
@@ -15,14 +17,6 @@ const showModal = ref(false);
 
     <!-- الرقم -->
     <div class="text-sm text-gray-600 break-words">📞 {{ review.phone }}</div>
-
-    <!-- نوع العرض -->
-    <div class="text-sm text-gray-500">
-        Type:
-      <span :class="review.is_public ? 'text-green-600' : 'text-blue-600'">
-        {{ review.is_public === 1 ? " Public " : "(Seller)" }}
-      </span>
-    </div>
 
     <div>
       <p class="text-gray-700 text-sm line-clamp-3 break-words">
@@ -33,8 +27,9 @@ const showModal = ref(false);
         class="text-indigo-600 text-sm mt-1 hover:underline"
         @click="showModal = true"
       >
-      see more
-    </button>
+      {{translations.see_more}}
+
+      </button>
     </div>
     <!-- Modal -->
     <div
@@ -42,7 +37,8 @@ const showModal = ref(false);
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
       <div class="bg-white p-6 rounded-lg max-w-lg w-full space-y-4 shadow-lg">
-        <h3 class="text-lg font-semibold text-gray-800">Content of Review</h3>
+        <h3 class="text-lg font-semibold text-gray-800">{{translations.content_of_review}}
+        </h3>
         <p class="text-gray-700 text-sm whitespace-pre-line break-words">
           {{ review.content }}
         </p>
@@ -51,7 +47,7 @@ const showModal = ref(false);
             class="px-4 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700"
             @click="showModal = false"
           >
-            Close
+          {{translations.close}}
           </button>
         </div>
       </div>

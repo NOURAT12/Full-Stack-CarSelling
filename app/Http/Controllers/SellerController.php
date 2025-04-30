@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Car;
 use App\Models\Product;
+use App\Models\Review;
 use App\Models\Setting;
 use App\Models\User;
 use App\Traits\ImageTrait;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
@@ -33,10 +35,14 @@ class SellerController extends Controller
         }
 
         $settings = Setting::first();
-        $settings->logo = $this->getLogo(image: $settings->logo);
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         return Inertia::render('Cars/Index', [
             'settings' => $settings,
             'cars' => $cars,
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
         ]);
     }
 
@@ -46,9 +52,13 @@ class SellerController extends Controller
     public function create()
     {
         $settings = Setting::first();
-        $settings->logo = $this->getLogo(image: $settings->logo);
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         return Inertia::render('Cars/Create', [
             'settings' => $settings,
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
         ]);
     }
 
@@ -108,8 +118,9 @@ class SellerController extends Controller
     public function show(Car $car)
     {
         $settings = Setting::first();
-        $settings->logo = $this->getLogo(image: $settings->logo);
-
+        if ($settings->logo) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         $imagePaths = json_decode($car->carimages, true); // نحول النص إلى مصفوفة
 
         $carImages = [];
@@ -126,15 +137,21 @@ class SellerController extends Controller
             'car' => $car,
             'settings' => $settings,
             'user' => Auth::user(),
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
         ]);
     }
     public function edit(Car $car)
     {
         $settings = Setting::first();
-        $settings->logo = $this->getLogo(image: $settings->logo);
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         return Inertia::render('Cars/Edit', [
             'car' => $car,
             'settings' => $settings,
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
         ]);
     }
 
@@ -193,17 +210,34 @@ class SellerController extends Controller
      */
     public function destroy(Car $car)
     {
-            $oldImages = json_decode($car->carimages, true);
-            foreach ($oldImages as $oldImage) {
-                if (file_exists(public_path($oldImage))) {
-                    File::delete(public_path($oldImage));
-                }
+        $oldImages = json_decode($car->carimages, true);
+        foreach ($oldImages as $oldImage) {
+            if (file_exists(public_path($oldImage))) {
+                File::delete(public_path($oldImage));
             }
-    
+        }
+
         $car->delete();
         return Redirect::back()->with('message', 'Car deleted successfully');
     }
 
+
+    public function indexReviews()
+    {
+        $user_id=auth::user()->id;
+        $cars=Car::where('user_id',$user_id)->get()->pluck('id');
+        $reviews = Review::query()->whereIn('car_id',$cars)->where('status',1)->paginate(8);
+        $settings = Setting::first();
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
+        return Inertia::render('Seller/Reviews/Index', [
+            'settings' => $settings,
+            'reviews' => $reviews,
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
+        ]);
+    }
     /// logout
     public function logout()
     {

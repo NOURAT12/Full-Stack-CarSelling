@@ -8,10 +8,12 @@ use App\Models\Review;
 use Illuminate\Http\Request;
 use App\Models\Setting;
 use App\Traits\ImageTrait;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
+
 class ReviewsController extends Controller
 {
     /**
@@ -19,48 +21,47 @@ class ReviewsController extends Controller
      */
     use ImageTrait;
 
-    public function index()
+    public function index(Request $request)
     {
-        $reviews = Review::query()->paginate(8);
+        $status = $request->get('status');
+
+        $query = Review::query();
+
+        if ($status === 'approved') {
+            $query->where('status', 1);
+        } elseif ($status === 'rejected') {
+            $query->where('status', 0);
+        }
+
+        $reviews = $query->latest()->paginate(8);
 
         $settings = Setting::first();
-        $settings->logo = $this->getLogo($settings->logo);
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         return Inertia::render('Reviews/Index', [
-            'settings' => $settings,
             'reviews' => $reviews,
+            'settings' => $settings,
+            'filterStatus' => $status ?? 'all',
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
         ]);
     }
 
     public function updateStatus(Request $request, $id)
-{
-    $request->validate([
-        'status' => 'required|in:0,1',
-    ]);
+    {
+        $request->validate([
+            'status' => 'required|in:0,1',
+        ]);
 
-    $review = Review::findOrFail($id);
-    $review->status = $request->status;
+        $review = Review::findOrFail($id);
+        $review->status = $request->status;
 
-    $review->save();
+        $review->save();
 
-    return Redirect::back()->with('message', 'Review status updated successfully.');
+        return Redirect::back()->with('message', 'Review status updated successfully.');
+    }
 
-}
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    // public function create()
-    // {
-    //     $settings = Setting::first();
-    //     $settings->logo = $this->getLogo(image: $settings->logo);
-    //     return Inertia::render('Reviews/Create', [
-    //         'settings' => $settings,
-    //     ]);
-    // }
-
-    /**
-     * Store a newly created resource in storage.
-     */
 
     public function store(Request $request)
     {
@@ -92,7 +93,9 @@ class ReviewsController extends Controller
     public function show(Ad $advertisement)
     {
         $settings = Setting::first();
-        $settings->logo = $this->getLogo(image: $settings->logo);
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         $advertisement->image = $this->getLogo(image: $advertisement->image);
 
 
@@ -105,10 +108,14 @@ class ReviewsController extends Controller
     public function edit(Ad $advertisement)
     {
         $settings = Setting::first();
-        $settings->logo = $this->getLogo(image: $settings->logo);
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         return Inertia::render('Advertisements/Edit', [
             'advertisement' => $advertisement,
             'settings' => $settings,
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
         ]);
     }
 
@@ -124,7 +131,7 @@ class ReviewsController extends Controller
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date'],
             'location' => ['required', 'string'],
-            'image' => ['nullable','image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ]);
 
         $image = $advertisement->image;
@@ -160,4 +167,5 @@ class ReviewsController extends Controller
         }
         $advertisement->delete();
         return Redirect::back()->with('message', 'Car deleted successfully');
-    }}
+    }
+}

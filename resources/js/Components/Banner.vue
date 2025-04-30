@@ -25,19 +25,21 @@
       @click.stop="prevAd"
       class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-2 rounded-full"
     >
-      ‹
+    <div v-if="isRtl">›</div>
+    <div v-else>‹</div>
     </button>
     <button
       @click.stop="nextAd"
       class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-2 rounded-full"
     >
-      ›
+    <div v-if="isRtl">‹</div>
+    <div v-else>›</div>
     </button>
   </div>
 </template>
 
   <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted ,computed} from "vue";
 import { useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -47,6 +49,8 @@ const props = defineProps({
     default: 5,
   },
 });
+const locale = ref(localStorage.getItem("locale") || "en");
+const isRtl = computed(() => locale.value === "ar");
 
 const currentIndex = ref(0);
 const currentAd = ref(props.ads[0]);

@@ -8,7 +8,7 @@ const props = defineProps({
 
 <template>
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-        <div class="text-center mb-6">
+        <div class="text-center mb-6" v-if="settings">
             <img :src="settings.logo" alt="Logo" class="mx-auto h-20 w-auto" />
         </div>
 

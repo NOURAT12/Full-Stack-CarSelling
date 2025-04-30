@@ -1,10 +1,10 @@
 <template>
   <Head title="New Car" />
 
-  <SellerAuthenticatedLayout :settings="settings">
+  <SellerAuthenticatedLayout :locale="locale" :translations="translations" :settings="settings">
     <template #header>
       <h2 class="font-semibold text-2xl text-gray-800 leading-tight">
-        Add New Car
+        {{translations.add_car}}
       </h2>
     </template>
 
@@ -15,7 +15,7 @@
         <form class="p-6" @submit.prevent="submit">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <InputLabel for="brand" value="Brand" />
+              <InputLabel for="brand" :value="translations.brand" />
               <input
                 id="brand"
                 type="text"
@@ -25,7 +25,7 @@
               <InputError class="mt-2" :message="form.errors.brand" />
             </div>
             <div>
-              <InputLabel for="model" value="Model" />
+              <InputLabel for="model" :value="translations.model" />
               <input
                 id="model"
                 type="text"
@@ -36,20 +36,20 @@
             </div>
             <!-- Year Dropdown -->
             <div>
-              <InputLabel for="year" value="Year" />
+              <InputLabel for="year" :value="translations.year" />
               <select
                 id="year"
                 class="mt-1 block w-full rounded border-gray-300"
                 v-model="form.year"
               >
-                <option disabled value="">Select Year</option>
+                <option disabled value="">{{translations.select_year}}</option>
                 <option v-for="y in years" :key="y" :value="y">{{ y }}</option>
               </select>
               <InputError class="mt-2" :message="form.errors.year" />
             </div>
 
             <div>
-                <InputLabel for="price" value="Price" />
+                <InputLabel for="price" :value="translations.price" />
                 <input
                   id="price"
                   type="number"
@@ -59,7 +59,7 @@
                 <InputError class="mt-2" :message="form.errors.price" />
               </div>
             <div>
-                <InputLabel for="color" value="Color" />
+                <InputLabel for="color" :value="translations.color" />
                 <input
                   id="color"
                   type="text"
@@ -69,7 +69,7 @@
                 <InputError class="mt-2" :message="form.errors.color" />
               </div>
             <div>
-                <InputLabel for="city" value="City" />
+                <InputLabel for="city" :value="translations.city" />
                 <input
                   id="city"
                   type="text"
@@ -79,7 +79,7 @@
                 <InputError class="mt-2" :message="form.errors.city" />
               </div>
             <div>
-                <InputLabel for="country" value="Country" />
+                <InputLabel for="country" :value="translations.country" />
                 <input
                   id="country"
                   type="text"
@@ -91,21 +91,21 @@
 
             <!-- Sold Selector -->
             <div>
-              <InputLabel for="sold" value="Status" />
+              <InputLabel for="sold" :value="translations.status" />
               <select
                 id="sold"
                 class="mt-1 block w-full rounded border-gray-300"
                 v-model="form.sold"
               >
-                <option value="0">Available</option>
-                <option value="1">Sold</option>
+                <option value="0">{{translations.available}}</option>
+                <option value="1">{{translations.sold}}</option>
               </select>
               <InputError class="mt-2" :message="form.errors.sold" />
             </div>
 
             <!-- Image Upload -->
             <div class="sm:col-span-2">
-              <InputLabel for="carimages" value="Car Images" />
+              <InputLabel for="carimages" :value="translations.car_image" />
               <input
                 id="carimages"
                 type="file"
@@ -118,7 +118,7 @@
 
             <!-- Description -->
             <div class="sm:col-span-2">
-              <InputLabel for="description" value="Description" />
+              <InputLabel for="description" :value="translations.description" />
               <textarea
                 id="description"
                 rows="4"
@@ -134,7 +134,7 @@
               :disabled="form.processing"
               :class="{ 'opacity-50': form.processing }"
             >
-              Store
+            {{translations.store}}
             </PrimaryButton>
           </div>
         </form>
@@ -149,10 +149,11 @@ import { Head, useForm } from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import FormGroup from "@/Components/FormGroup.vue"; // optional shared component for cleaner inputs
 
 defineProps({
   settings: Object,
+  locale: String,
+  translations: Object,
 });
 // Current year logic
 const currentYear = new Date().getFullYear();

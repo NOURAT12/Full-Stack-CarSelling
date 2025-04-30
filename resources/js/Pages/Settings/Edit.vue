@@ -1,7 +1,11 @@
 <template>
   <Head title="Edit Settings" />
 
-  <AuthenticatedLayout :settings="settings">
+  <AuthenticatedLayout
+    :translations="translations"
+    :locale="locale"
+    :settings="settings"
+  >
     <template #header>
       <h2 class="font-semibold text-xl text-gray-800 leading-tight">
         Edit Settings
@@ -17,7 +21,7 @@
         >
           <!-- Website Name -->
           <div>
-            <InputLabel for="website_name" value="Website Name" />
+            <InputLabel for="website_name" :value="translations.website_name" />
             <TextInput
               id="website_name"
               type="text"
@@ -30,7 +34,7 @@
 
           <!-- Facebook -->
           <div>
-            <InputLabel for="facebook" value="Facebook" />
+            <InputLabel for="facebook" :value="translations.facebook" />
             <TextInput
               id="facebook"
               type="text"
@@ -42,7 +46,7 @@
 
           <!-- Instagram -->
           <div>
-            <InputLabel for="instgram" value="Instagram" />
+            <InputLabel for="instgram" :value="translations.instgram" />
             <TextInput
               id="instgram"
               type="text"
@@ -54,7 +58,7 @@
 
           <!-- WhatsApp -->
           <div>
-            <InputLabel for="whatsapp" value="WhatsApp" />
+            <InputLabel for="whatsapp" :value="translations.whatsApp" />
             <TextInput
               id="whatsapp"
               type="text"
@@ -66,7 +70,7 @@
 
           <!-- Phone -->
           <div>
-            <InputLabel for="phone" value="Phone" />
+            <InputLabel for="phone" :value="translations.phone" />
             <TextInput
               id="phone"
               type="text"
@@ -78,7 +82,7 @@
 
           <!-- Mobile -->
           <div>
-            <InputLabel for="mobile" value="Mobile" />
+            <InputLabel for="mobile" :value="translations.mobile_number" />
             <TextInput
               id="mobile"
               type="text"
@@ -90,7 +94,7 @@
 
           <!-- Titles (multiple inputs) -->
           <div>
-            <InputLabel value="Titles" />
+            <InputLabel :value="translations.titles" />
             <div
               v-for="(title, index) in form.titles"
               :key="index"
@@ -106,7 +110,7 @@
                 @click="removeTitle(index)"
                 class="text-red-600 hover:underline"
               >
-                Remove
+              {{translations.remove}}
               </button>
             </div>
             <button
@@ -114,14 +118,14 @@
               @click="addTitle"
               class="text-blue-600 hover:underline"
             >
-              Add Title
+            {{translations.add_titles}}
             </button>
             <InputError class="mt-2" :message="form.errors['titles']" />
           </div>
 
           <!-- Website Image -->
           <div>
-            <InputLabel for="website_image" value="Website Images" />
+            <InputLabel for="website_image" :value="translations.website_images" />
             <input
               id="website_image"
               name="website_image[]"
@@ -135,7 +139,7 @@
 
           <!-- Images -->
           <div>
-            <InputLabel for="images" value="Images" />
+            <InputLabel for="images" :value="translations.images" />
             <input
               id="images"
               type="file"
@@ -148,7 +152,7 @@
 
           <!-- Logo -->
           <div>
-            <InputLabel for="logo" value="Logo" />
+            <InputLabel for="logo" :value="translations.logo" />
             <input
               id="logo"
               type="file"
@@ -160,7 +164,7 @@
 
           <!-- Submit -->
           <div class="flex justify-end mt-6">
-            <PrimaryButton>Update</PrimaryButton>
+            <PrimaryButton>{{translations.update}}</PrimaryButton>
           </div>
         </form>
       </div>
@@ -178,6 +182,8 @@ import TextInput from "@/Components/TextInput.vue";
 
 const props = defineProps({
   settings: Object,
+  translations: Object,
+  locale: String,
 });
 
 const form = useForm({

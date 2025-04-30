@@ -1,16 +1,55 @@
 <script setup>
-import { ref } from "vue";
-import ApplicationLogo from "@/Components/ApplicationLogo.vue";
-import Dropdown from "@/Components/Dropdown.vue";
-import DropdownLink from "@/Components/DropdownLink.vue";
 import NavLink from "@/Components/NavLink.vue";
 import Footer from "@/Components/Footer.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import { Link } from "@inertiajs/vue3";
-
+import { router } from "@inertiajs/vue3";
+import { ref, onMounted, watch } from "vue";
 const showingNavigationDropdown = ref(false);
 const props = defineProps({
   settings: Object,
+  translations: Object,
+  locale: String,
+});
+const localeState = ref(localStorage.getItem("locale") || props.locale || "en");
+
+function toggleLang() {
+  const newLang = localeState.value === "en" ? "ar" : "en";
+  localeState.value = newLang;
+  localStorage.setItem("locale", newLang);
+
+  router.reload({
+    preserveScroll: true,
+    preserveState: true,
+    headers: {
+      "X-Locale": newLang,
+    },
+  });
+}
+function updateDirection(lang) {
+  document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+}
+
+// تحديث الاتجاه أول ما يشتغل
+onMounted(() => {
+  updateDirection(localeState.value);
+
+  const serverLocale = props.locale;
+  const clientLocale = localeState.value;
+
+  if (serverLocale !== clientLocale) {
+    router.reload({
+      preserveScroll: true,
+      preserveState: true,
+      headers: {
+        "X-Locale": clientLocale,
+      },
+    });
+  }
+});
+// تحديث الاتجاه كل ما تتغير اللغة
+watch(localeState, (newLang) => {
+  updateDirection(newLang);
 });
 </script>
 
@@ -29,7 +68,7 @@ const props = defineProps({
           <div class="flex justify-between h-16">
             <div class="flex">
               <!-- Logo -->
-              <div class="shrink-0 flex items-center">
+              <div class="shrink-0 flex items-center" v-if="settings">
                 <Link :href="route('admindashboard')">
                   <div class="text-center">
                     <img
@@ -42,31 +81,31 @@ const props = defineProps({
               </div>
 
               <!-- Navigation Links -->
-              <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+              <div class="hidden space-x-8 rtl:space-x-reverse sm:-my-px sm:ms-10 sm:flex">
                 <NavLink
                   :href="route('admindashboard')"
                   :active="route().current('admindashboard')"
                 >
-                  Dashboard
+                {{ translations.dashboard }}
                 </NavLink>
                 <NavLink
                   :href="route('advertisements.index')"
                   :active="route().current('advertisements.index')"
                 >
-                  Advertisements
+                {{ translations.advertisements }}
                 </NavLink>
 
                 <NavLink
                   :href="route('reviews.index')"
                   :active="route().current('reviews.index')"
                 >
-                  Reviews
+                {{ translations.reviews }}
                 </NavLink>
                 <NavLink
                   :href="route('settings.index')"
-                  :active="route().current('S=settings.index')"
+                  :active="route().current('settings.index')"
                 >
-                  Settings
+                {{ translations.settings }}
                 </NavLink>
               </div>
             </div>
@@ -75,17 +114,25 @@ const props = defineProps({
               <span class="text-gray-700 font-medium">{{
                 $page.props.auth.user.username
               }}</span>
+              <!-- زر تبديل اللغة -->
+              <button
+                @click="toggleLang"
+                class="flex items-center ms-4 space-x-2 rtl:space-x-reverse bg-gray-100 px-3 py-1 rounded hover:bg-gray-200"
+              >
+                <span class="text-lg">🌐</span>
+                <span>{{ locale === "en" ? "العربية" : "English" }}</span>
+              </button>
               <Link
                 :href="route('logout')"
                 method="post"
                 as="button"
-                class="ml-4"
+                class="ms-4"
               >
                 <button
                   type="submit"
                   class="px-3 py-2 bg-red-500 text-white text-sm font-semibold rounded-md hover:bg-red-600 transition"
                 >
-                  Log Out
+                {{ translations.log_out }}
                 </button>
               </Link>
             </div>
@@ -128,12 +175,68 @@ const props = defineProps({
           </div>
         </div>
       </nav>
+      <!-- Responsive Navigation Menu -->
+      <div v-if="showingNavigationDropdown" class="sm:hidden">
+        <div class="pt-2 pb-3 space-y-1 rtl:space-y-reverse">
+          <ResponsiveNavLink
+            :href="route('admindashboard')"
+            :active="route().current('admindashboard')"
+          >
+          {{ translations.dashboard }}
+          </ResponsiveNavLink>
+          <ResponsiveNavLink
+            :href="route('advertisements.index')"
+            :active="route().current('advertisements.index')"
+          >
+          {{ translations.advertisements }}
+          </ResponsiveNavLink>
+          <ResponsiveNavLink
+            :href="route('reviews.index')"
+            :active="route().current('reviews.index')"
+          >
+          {{ translations.reviews }}
+          </ResponsiveNavLink>
+          <ResponsiveNavLink
+            :href="route('settings.index')"
+            :active="route().current('settings.index')"
+          >
+          {{ translations.settings }}
+          </ResponsiveNavLink>
+        </div>
+
+        <!-- User info & logout for mobile -->
+        <div class="pt-4 pb-1 border-t border-gray-200">
+          <div class="px-4 text-gray-700 font-medium">
+            {{ $page.props.auth.user.username }}
+          </div>
+          <!-- زر تبديل اللغة -->
+          <button
+            @click="toggleLang"
+            class="flex items-center ms-4 space-x-2 rtl:space-x-reverse bg-gray-100 px-3 py-1 rounded hover:bg-gray-200"
+          >
+            <span class="text-lg">🌐</span>
+            <span>{{ locale === "en" ? "العربية" : "English" }}</span>
+          </button>
+          <div class="mt-3 space-y-1 rtl:space-y-reverse">
+            <ResponsiveNavLink
+              :href="route('logout')"
+              method="post"
+              as="button"
+            >
+            {{ translations.log_out }}
+            </ResponsiveNavLink>
+          </div>
+        </div>
+      </div>
+
       <!-- Page Content -->
       <main>
         <slot />
       </main>
     </div>
     <!-- Footer -->
-    <Footer :settings="settings" />
+    <div v-if="settings" dir="ltr">
+      <Footer :settings="settings" />
+    </div>
   </div>
 </template>

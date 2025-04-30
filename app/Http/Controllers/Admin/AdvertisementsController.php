@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Car;
 use App\Models\Setting;
 use App\Traits\ImageTrait;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
@@ -28,10 +29,14 @@ class AdvertisementsController extends Controller
         }
 
         $settings = Setting::first();
-        $settings->logo = $this->getLogo($settings->logo);
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         return Inertia::render('Advertisements/Index', [
             'settings' => $settings,
             'advertisements' => $ads,
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
         ]);
     }
 
@@ -41,9 +46,13 @@ class AdvertisementsController extends Controller
     public function create()
     {
         $settings = Setting::first();
-        $settings->logo = $this->getLogo(image: $settings->logo);
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         return Inertia::render('Advertisements/Create', [
             'settings' => $settings,
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
         ]);
     }
 
@@ -89,23 +98,31 @@ class AdvertisementsController extends Controller
     public function show(Ad $advertisement)
     {
         $settings = Setting::first();
-        $settings->logo = $this->getLogo(image: $settings->logo);
+        if ($settings->logo) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         $advertisement->image = $this->getLogo(image: $advertisement->image);
 
-        
+
 
         return Inertia::render('Advertisements/Show', [
             'advertisement' => $advertisement,
             'settings' => $settings,
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
         ]);
     }
     public function edit(Ad $advertisement)
     {
         $settings = Setting::first();
-        $settings->logo = $this->getLogo(image: $settings->logo);
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         return Inertia::render('Advertisements/Edit', [
             'advertisement' => $advertisement,
             'settings' => $settings,
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
         ]);
     }
 
@@ -121,7 +138,7 @@ class AdvertisementsController extends Controller
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date'],
             'location' => ['required', 'string'],
-            'image' => ['nullable','image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ]);
 
         $image = $advertisement->image;

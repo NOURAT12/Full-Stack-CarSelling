@@ -3,6 +3,8 @@ import { Link } from "@inertiajs/vue3";
 
 defineProps({
   car: Object,
+  translations: Object,
+
 });
 </script>
 
@@ -16,7 +18,7 @@ defineProps({
         :alt="`${car.brand} ${car.model}`"
       />
       <div v-else class="w-full h-48 bg-gray-200 rounded-lg mb-4 flex items-center justify-center text-gray-500">
-        No Image
+        {{translations.no_image}}
       </div>
 
       <h3 class="text-xl font-semibold text-gray-800 mb-2">
@@ -31,19 +33,19 @@ defineProps({
         <span class="text-green-600 font-bold">{{ car.price }} $</span>
         <span
           class="text-xs font-medium"
-          :class="car.sold ? 'text-green-500' : 'text-red-600'"
+          :class="car.sold === '1'?  'text-red-600' : 'text-green-500'"
         >
-          {{ car.sold ? "Available" : "Sold" }}
-        </span>
+        {{ car.sold == "1" ? translations.sold : translations.available }}
+    </span>
       </div>
 
       <!-- Edit and Delete buttons -->
-      <div class="mt-4 flex space-x-4 justify-end">
+      <div class="mt-4 flex space-x-4 rtl:space-x-reverse justify-end">
         <Link
           :href="route('cars.edit', car.id)"
           class="px-4 py-2 bg-indigo-500 hover:bg-indigo-700 text-white rounded-md text-sm"
         >
-          Edit
+        {{translations.edit}}
         </Link>
         <Link
         :href="route('cars.destroy', car.id)"
@@ -51,7 +53,7 @@ defineProps({
         as="button"
         type="button"
         class="px-4 py-2 bg-red-500 hover:bg-red-700 text-white rounded-md text-sm"
-        >Delete
+        >{{translations.delete}}
       </Link>
       </div>
     </div>

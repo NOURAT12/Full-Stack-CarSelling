@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -35,8 +37,22 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'flash' => [
-                'message' => fn () =>$request->session()->get('message')
+                'message' => fn() => $request->session()->get('message')
+            ],
+            [
+                'locale' => fn() => app()->getLocale(),
             ]
         ];
     }
+    public function handle($request, Closure $next)
+    {
+        if ($locale = $request->header('X-Locale')) {
+            App::setLocale($locale);
+        }
+
+        return parent::handle($request, $next);
+    }
+
+
+
 }

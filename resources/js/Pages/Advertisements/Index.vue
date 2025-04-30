@@ -7,13 +7,15 @@ import AdvertisementCard from "@/Components/AdvertisementCard.vue"; // تأكد 
 defineProps({
   advertisements: Object,
   settings: Object,
+  translations: Object,
+  locale: String,
 });
 </script>
 
 <template>
   <Head title="Advertisements Index" />
 
-  <AuthenticatedLayout :settings="settings">
+  <AuthenticatedLayout :translations="translations" :locale="locale" :settings="settings">
     <template #header>
       <h2 class="font-semibold text-xl text-gray-800 leading-tight">Advertisements</h2>
     </template>
@@ -26,14 +28,15 @@ defineProps({
             :href="route('advertisements.create')"
             class="px-4 py-2 bg-indigo-500 hover:bg-indigo-700 text-white rounded-md"
           >
-            New Advertisement
-          </Link>
+          {{ translations.new_advertisement }}
+        </Link>
         </div>
 
         <!-- عرض السيارات -->
         <div v-if="advertisements.data.length > 0">
           <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             <advertisementCard
+            :translations="translations" 
               v-for="advertisement in advertisements.data"
               :key="advertisement.id"
               :advertisement="advertisement"
@@ -73,7 +76,7 @@ defineProps({
 
         <!-- لا توجد سيارات -->
         <div v-else class="text-center text-gray-500 text-lg mt-10">
-          You don't have any advertisements yet.
+            {{ translations.you_ad }}
         </div>
       </div>
     </div>

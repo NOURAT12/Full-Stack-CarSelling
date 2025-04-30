@@ -7,15 +7,17 @@ import CarCard from "@/Components/CarCard.vue"; // تأكد من المسار ا
 defineProps({
   cars: Object,
   settings: Object,
+  locale: String,
+  translations: Object,
 });
 </script>
 
 <template>
   <Head title="Cars Index" />
 
-  <SellerAuthenticatedLayout :settings="settings">
+  <SellerAuthenticatedLayout :locale="locale" :translations="translations" :settings="settings">
     <template #header>
-      <h2 class="font-semibold text-xl text-gray-800 leading-tight">Cars</h2>
+      <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{translations.cars}}</h2>
     </template>
 
     <div class="py-12">
@@ -26,7 +28,7 @@ defineProps({
             :href="route('cars.create')"
             class="px-4 py-2 bg-indigo-500 hover:bg-indigo-700 text-white rounded-md"
           >
-            New Car
+          {{translations.new_car}}
           </Link>
         </div>
         <div>
@@ -36,7 +38,7 @@ defineProps({
             <div
               class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
             >
-              <CarCard v-for="car in cars.data" :key="car.id" :car="car">
+              <CarCard :translations="translations" v-for="car in cars.data" :key="car.id" :car="car">
               </CarCard>
             </div>
 
@@ -69,7 +71,7 @@ defineProps({
 
           <!-- لا توجد سيارات -->
           <div v-else class="text-center text-gray-500 text-lg mt-10">
-            You don't have any cars yet.
+            {{translations.you}}
           </div>
         </div>
       </div>

@@ -6,13 +6,15 @@ defineProps({
   advertisement: Object,
   user: Object,
   settings: Object,
+  translations: Object,
+  locale: String,
 });
 </script>
 
 <template>
   <Head :title="advertisement.full_name" />
 
-  <AuthenticatedLayout :settings="settings">
+  <AuthenticatedLayout :translations="translations" :locale="locale" :settings="settings">
     <div class="max-w-6xl mx-auto py-12 px-6">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <!-- نصف لعرض الصورة -->
@@ -28,7 +30,7 @@ defineProps({
               v-else
               class="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center text-gray-500"
             >
-              No Image
+              {{translations.no_image}}
             </div>
           </div>
         </div>
@@ -45,7 +47,7 @@ defineProps({
           >
             <div class="space-y-4">
               <div>
-                <strong class="text-gray-700 block">Ad URL:</strong>
+                <strong class="text-gray-700 block">{{translations.URL}}:</strong>
                 <a
                   :href="advertisement.ad_url"
                   target="_blank"
@@ -55,19 +57,19 @@ defineProps({
                 </a>
               </div>
               <div>
-                <strong class="text-gray-700">Location:</strong>
+                <strong class="text-gray-700">{{translations.location}}:</strong>
                 <p>{{ advertisement.location }}</p>
               </div>
               <div>
-                <strong class="text-gray-700">Views (Hit):</strong>
+                <strong class="text-gray-700">{{translations.views}}:</strong>
                 <p>{{ advertisement.hit }}</p>
               </div>
               <div>
-                <strong class="text-gray-700">Start Date:</strong>
+                <strong class="text-gray-700">{{translations.start_date}}:</strong>
                 <p>{{ advertisement.start_date }}</p>
               </div>
               <div>
-                <strong class="text-gray-700">End Date:</strong>
+                <strong class="text-gray-700">{{translations.end_date}}:</strong>
                 <p>{{ advertisement.end_date }}</p>
               </div>
             </div>

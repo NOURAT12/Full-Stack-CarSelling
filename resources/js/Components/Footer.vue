@@ -12,6 +12,7 @@
 <script setup>
 const props = defineProps({
   settings: Object,
+  translations: Object,
 })
 
 </script>

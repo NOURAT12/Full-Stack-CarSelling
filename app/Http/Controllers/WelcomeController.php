@@ -6,6 +6,7 @@ use App\Models\Car;
 use Illuminate\Http\Request;
 use App\Models\Setting;
 use App\Traits\ImageTrait;
+use Illuminate\Support\Facades\App;
 use Inertia\Inertia;
 
 class WelcomeController extends Controller
@@ -15,11 +16,16 @@ class WelcomeController extends Controller
     public function index()
     {
         $settings = Setting::first();
-
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         return Inertia::render('Welcome', [
             'settings' => $settings,
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
         ]);
     }
+
     public function sellerDash()
     {
         $cars = Car::query()->paginate(8);
@@ -29,10 +35,14 @@ class WelcomeController extends Controller
         }
 
         $settings = Setting::first();
-        $settings->logo = $this->getLogo(image: $settings->logo);
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         return Inertia::render('Seller/Dashboard', [
             'settings' => $settings,
             'cars' => $cars,
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
         ]);
     }
 
@@ -45,10 +55,14 @@ class WelcomeController extends Controller
         }
 
         $settings = Setting::first();
-        $settings->logo = $this->getLogo(image: $settings->logo);
+        if ($settings) {
+            $settings->logo = $this->getLogo($settings->logo);
+        }
         return Inertia::render('Admin/Dashboard', [
             'settings' => $settings,
             'cars' => $cars,
+            'translations' => trans('messages'),
+            'locale' => App::getLocale(),
         ]);
     }
 }

@@ -5,9 +5,28 @@ import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
+import { ref, onMounted } from "vue";
 
 const props = defineProps({
   settings: Object,
+    locale: String,
+  translations: Object,
+});
+const localeState = ref(localStorage.getItem("locale") || props.locale || "en");
+router.reload({
+  preserveScroll: true,
+  preserveState: true,
+  headers: {
+    "X-Locale": localeState.value,
+  },
+
+});
+function updateDirection(lang) {
+  document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+}
+onMounted(() => {
+  updateDirection(localeState.value);
 });
 
 const form = useForm({
@@ -46,12 +65,12 @@ const submit = () => {
     <!-- نموذج التسجيل -->
     <form @submit.prevent="submit" class="p-8 space-y-6 max-w-xl mx-auto">
       <h2 class="text-2xl font-semibold text-center text-gray-800">
-        Create your account
+        {{translations.create}}
       </h2>
 
       <!-- Username -->
       <div>
-        <InputLabel for="username" value="Username" />
+        <InputLabel for="username" :value="translations.username" />
         <TextInput
           id="username"
           type="text"
@@ -65,7 +84,7 @@ const submit = () => {
 
       <!-- Email -->
       <div>
-        <InputLabel for="email" value="Email" />
+        <InputLabel for="email" :value="translations.email" />
         <TextInput
           id="email"
           type="email"
@@ -78,7 +97,7 @@ const submit = () => {
 
       <!-- Password -->
       <div>
-        <InputLabel for="password" value="Password" />
+        <InputLabel for="password" :value="translations.password" />
         <TextInput
           id="password"
           type="password"
@@ -91,7 +110,7 @@ const submit = () => {
 
       <!-- Confirm Password -->
       <div>
-        <InputLabel for="password_confirmation" value="Confirm Password" />
+        <InputLabel for="password_confirmation" :value="translations.confirm_password" />
         <TextInput
           id="password_confirmation"
           type="password"
@@ -104,7 +123,7 @@ const submit = () => {
 
       <!-- Image Upload -->
       <div>
-        <InputLabel for="image" value="Profile Image" />
+        <InputLabel for="image" :value="translations.profile_image" />
         <input
           id="image"
           type="file"
@@ -115,7 +134,7 @@ const submit = () => {
       </div>
       <!-- Mobile Number -->
       <div>
-        <InputLabel for="mobile" value="Mobile Number" />
+        <InputLabel for="mobile" :value="translations.mobile_number" />
         <TextInput
           id="mobile"
           type="tel"
@@ -130,7 +149,7 @@ const submit = () => {
 
       <!-- City -->
       <div>
-        <InputLabel for="city" value="City" />
+        <InputLabel for="city" :value="translations.city" />
         <TextInput
           id="city"
           type="text"
@@ -143,7 +162,7 @@ const submit = () => {
 
       <!-- Country -->
       <div>
-        <InputLabel for="country" value="Country" />
+        <InputLabel for="country" :value="translations.country" />
         <TextInput
           id="country"
           type="text"
@@ -156,16 +175,16 @@ const submit = () => {
 
       <!-- Role -->
       <div>
-        <InputLabel for="role" value="Role" />
+        <InputLabel for="role" :value="translations.role" />
         <select
           id="role"
           v-model="form.role"
           class="mt-1 block w-full rounded-lg border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
           required
         >
-          <option disabled value="">Select Role</option>
-          <option value="admin">Admin</option>
-          <option value="seller">Seller</option>
+          <option disabled value="">{{translations.select}}</option>
+          <option value="admin">{{translations.admin}}</option>
+          <option value="seller">{{translations.seller}}</option>
         </select>
         <InputError class="mt-2" :message="form.errors.role" />
       </div>
@@ -176,7 +195,7 @@ const submit = () => {
           :href="route('login')"
           class="text-sm text-indigo-600 hover:text-indigo-800 transition"
         >
-          Already registered?
+        {{translations.already_registered}}
         </Link>
 
         <PrimaryButton
@@ -184,7 +203,7 @@ const submit = () => {
           :class="{ 'opacity-25': form.processing }"
           :disabled="form.processing"
         >
-          Register
+        {{translations.register}}
         </PrimaryButton>
       </div>
     </form>
